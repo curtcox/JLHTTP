@@ -1,0 +1,174 @@
+
+
+CHANGES IN THE 2.5 RELEASE
+--------------------------
+- Removed VirtualHost.DEFAULT_HOST_NAME constant.
+- Changed addContentType parameter from File to InputStream.
+- Optimized readToken memory allocations.
+- Changed readToken with LF delimiter to also match CRLF and refactored readLine to reduce garbage.
+- Fixed missing query params when accessing a context ending with slash with directory index enabled.
+- Improved javadocs and misc. minor refactorings.
+
+
+
+
+CHANGES IN THE 2.4 RELEASE
+--------------------------
+- Added support for enabling SSL from command line.
+- Replaced HTTPServer.setSecure method with setServerSocketFactory fo easier SSL configuration.
+- Changed parseDate to be less lenient.
+- Fixed UnsupportedOperationException stack trace printed when closing SSL connection.
+- Fixed NullPointerException stack trace may be printed when stopping server.
+- Fixed Request context not updated by calling Request.setPath with path from different context.
+- Fixed possible NullPointerException when stopping the server immediately after starting it.
+- Reimplemented MultipartInputStream to reduce compiled size and object (garbage) creation.
+- Fixed several MultipartInputStream edge cases.
+- Improved MultipartInputStream error handling.
+- Improved MultipartInputStream preamble/epilogue handling.
+- Added limit parameter to split utility method.
+- Misc. tiny refactorings for consistency and reduced size.
+
+
+
+
+CHANGES IN THE 2.3 RELEASE
+--------------------------
+- Fixed missing welcome page when accessing non-root base context path without trailing slash.
+- Added context to Request.
+- Added path to ContextInfo.
+- Removed redundant context path from FileContextHandler (now taken from request).
+- Simplified and optimized VirtualHost.getContext method.
+- Optimized Request.getVirtualHost and Request.getContext lookups.
+
+
+
+
+CHANGES IN THE 2.2 RELEASE
+--------------------------
+- Fixed graceful socket closing error handling.
+- Changed ETag generated for string content to be weak.
+- Changed If-None-Match ETag handling to use weak matching algorithm.
+- Added Vary Accept-Encoding header to responses.
+- Added accessors for MultipartIterator.Part class fields.
+- Added setSocketTimeout setter.
+
+
+
+
+CHANGES IN THE 2.1 RELEASE
+--------------------------
+- Set setReuseAddress (SO_REUSEADDR) on server socket for quicker restarts.
+- Set setTcpNoDelay (TCP_NODELAY) on sockets for lower latency.
+- Added connection close header when responding to request that sent it.
+- Added connection close header when closing connection due to error.
+- Changed connection to close if response contains connection close header.
+- Removed error response when client disconnects between requests.
+- Fixed clearing existing headers when sending generic 500 error response.
+- Changed handleConnection to always close response, even on error after headers sent.
+- Added graceful socket closing (half-close and consume input before final close).
+- Added 408 Request Timeout support.
+- Optimized formatDate by reimplementing it without SimpleDateFormat.
+- Optimized bulk writes to response body stream.
+- Optimized ISO-8859-1/US-ASCII string encoding using getBytes utility method.
+- Optimized Request.getBaseURL reuse by caching parsed value.
+- Replaced Headers.iterator implementation to avoid extra 1.5K class file.
+- Changed transfer method to accept null OutputStream for discarding output.
+- Optimized transfer when discarding empty output.
+- Removed SocketHandlerThread constructor.
+- Removed Request.consumeBody method.
+- Improved javadocs and misc. minor refactorings.
+
+
+
+
+CHANGES IN THE 2.0 RELEASE
+--------------------------
+- Changed ChunkedOutputStream to write a chunk per standard write method invocation.
+- Added ChunkedOutputStream.close which writes trailing chunk if necessary.
+- Changed Response.sendHeaders to add chunked transfer encoding if length is unknown.
+- Changed Response.getBody to create encoding streams automatically according to headers.
+- Added Response.getOutputStream to get raw unencoded output stream.
+- Removed Response.getChunkedBody method.
+- Removed Response.isDiscardBody method.
+- Changed Response to implement Closeable for closing and flushing all streams.
+- Added gzip/deflate response compression support.
+- Added HTTPS support.
+- Fixed uncaught exception handling, error response and connection termination.
+- Removed persistent connections for HTTP/1.0 requests.
+- Changed connection persistence to work even if request/response body streams are closed.
+- Added isCompressible method to determine which content types can be compressed.
+- Added parameter to splitElements for converting elements to lowercase.
+- Changed lower-case conversions to ignore system locale.
+- Changed Response.sendHeaders to throw exception if headers were already sent.
+- Improved Transfer-Encoding header parsing.
+- Improved javadocs and misc. minor refactorings.
+
+
+
+
+CHANGES IN THE 1.3 RELEASE
+--------------------------
+- Added support for content type mapping via standard mime.types file.
+- Added full support for different HTTP method handlers per context.
+- Improved compliance of built-in HTTP method handling: OPTIONS *, Allow header, 405 status, etc.
+- Replaced parseParams utility method with parseParamsList for access to multi-valued parameters.
+- Fixed MultipartInputStream handling of several valid and invalid inputs.
+- Fixed MultipartInputStream.fill when reading form a very slow input stream.
+- Optimized MultipartInputStream buffer fill using partial boundary detection.
+- Optimized MultipartInputStream latency by returning data as soon as it is available.
+- Optimized MultipartInputStream performance by reducing in-memory copying.
+- Updated Server response header string and version number.
+- Fixed formatDate GMT time calculation.
+- Fixed serving non-directory files ending with a slash.
+- Changed Range header to be ignored if content is empty (return 200 instead of 416).
+- Changed files starting with dot to return 404 on all platforms.
+- Changed handleConnection method to accept input/output streams instead of socket.
+- Changed split method to support multiple delimiters.
+- Added Request.getParamsList method.
+- Added toMap and join utility methods.
+- Added sample dynamic context handler to main method.
+- Migrated to Maven build system, directory structure and artifact conventions.
+- Added OSGi headers to jar manifest.
+- Fixed javadoc errors when building with JDK 8.
+- Revamped HTTPServer class documentation with feature list, use cases and getting started sections.
+- Improved javadocs and misc. minor refactorings.
+
+
+
+
+CHANGES IN THE 1.2 RELEASE
+--------------------------
+- Split handleTransaction into preprocessTransaction and handleMethod, making it easier for subclasses to add filters.
+- Added MultipartIterator.Part.getString() convenience method to get a form input value as a string.
+- Added Response.getChunkedBody helper method to encourage proper use when body length is unknown.
+- Renamed utility method parseULong (parseLong) and changed it to treat sign characters as invalid.
+- Renamed utility methods trimLeft (ltrim), trimRight (rtrim), and toSizeApproxString (toSizeString).
+- Added @Override annotations.
+- Changed index and error pages HTML markup to use the HTML5 doctype.
+- Added explanation on how to support file uploads (via MultipartIterator).
+- Improved documentation and misc. minor refactorings.
+
+
+
+
+CHANGES IN THE 1.1 RELEASE
+--------------------------
+- Made jar file executable (added Main-Class attribute to manifest).
+- Fixed generated index date format on non-US locale (always use US).
+- Fixed Request.parseParams() preserving of parameter order.
+- Added no-arg constructor and setPort() method to allow post-construction port setting.
+- Fixed serveFile() appending of relative path to base directory.
+- Fixed double-slash when accessing root folder.
+- Added file upload support using the MultipartInputStream and MultipartIterator classes.
+- Added ltrim utility method.
+- Added parseParameters() method for easy header parameter handling.
+- Fixed sendError() default text for success statuses.
+- Changed default error text to include both status code and status description.
+- Improved documentation.
+
+
+
+
+CHANGES IN THE 1.0 RELEASE
+--------------------------
+- This is the first release of the Java Lightweight HTTP Server.

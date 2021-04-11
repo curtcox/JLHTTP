@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.freeutils</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.3</version>
+        <relativePath>../parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>jlhttp</artifactId>
+    <version>2.5</version>
+    <packaging>jar</packaging>
+
+    <name>JLHTTP</name>
+    <description>The Java Lightweight HTTP Server</description>
+    <url>http://www.freeutils.net/source/jlhttp/</url>
+    <licenses>
+        <license>
+            <name>GNU General Public License (GPL), Version 2.0</name>
+            <url>http://www.gnu.org/licenses/gpl-2.0.html</url>
+        </license>
+        <license>
+            <name>Commercial License</name>
+            <url>LICENSE.commercial.txt</url>
+        </license>
+    </licenses>
+
+    <properties>
+        <jdk.version>1.8</jdk.version>
+        <animal.sniffer.jdk.version>java18</animal.sniffer.jdk.version>
+        <skip.assembly>false</skip.assembly>
+    </properties>
+
+    <build>
+        <plugins>
+            <!-- make it an OSGi bundle -->
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        <manifest>
+                            <mainClass>net.freeutils.httpserver.HTTPServer</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!--
+            create a stripped (minimal) jar for resource-limited environments
+            (compiled without debug info, no extra metadata, better compression, etc.)
+            by building with the -Dstripped argument.
+        -->
+        <profile>
+            <id>stripped</id>
+            <activation>
+                <property>
+                    <name>stripped</name>
+                </property>
+            </activation>
+            <properties>
+                <jar.classifier>stripped</jar.classifier>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <debug>false</debug>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <classifier>${jar.classifier}</classifier>
+                            <excludes>
+                                <exclude>**/LICENSE*.*</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <!-- repack using pack200 to compress it better -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <executions>
+                            <execution>
+                                <id>repack</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${java.home}/../bin/pack200</executable>
+                                    <arguments>
+                                        <argument>--repack</argument>
+                                        <argument>--effort=9</argument>
+                                        <argument>--segment-limit=-1</argument>
+                                        <argument>--strip-debug</argument>
+                                        <argument>${project.build.directory}/${project.build.finalName}-${jar.classifier}.${project.packaging}</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
